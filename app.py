@@ -42,7 +42,7 @@ def transcribe_audio(audio_url):
 def save_transcription_to_files(text):
     with open('transcription.txt', 'w') as file:
         file.write(text)
-    srt_response = requests.get(f"{st.session_state['endpoint']}/st.session_state['transcript_id']/srt", headers={"authorization": st.secrets['api_key']})
+    srt_response = requests.get(f"{st.session_state['endpoint']}/{st.session_state['transcript_id']}/srt", headers={"authorization": st.secrets['api_key']})
     with open("transcription.srt", "w") as file:
         file.write(srt_response.text)
     with ZipFile('transcription.zip', 'w') as file:
@@ -93,4 +93,4 @@ def get_subtitle_file(transcript_id, api_token, file_format):
     else:
         raise RuntimeError(f"Failed to retrieve {file_format.upper()} file: {response.status_code} {response.reason}")
         
-get_subtitle_file(st.session_state['transcript_id'], st.secrets['api_key'], 'srt')
+#get_subtitle_file(st.session_state['transcript_id'], st.secrets['api_key'], 'srt')
