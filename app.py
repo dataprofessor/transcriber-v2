@@ -32,10 +32,6 @@ def transcribe_audio(audio_url):
     data = {"audio_url": audio_url}
     response = requests.post(st.session_state['endpoint'], json=data, headers=st.session_state['headers'])
     st.session_state['transcript_id'] = response.json()["id"]
-    ###
-    st.write(st.session_state['endpoint'])
-    st.write(st.session_state['transcript_id'])
-    ###
     while True:
         response = requests.get(f"{st.session_state['endpoint']}/{st.session_state['transcript_id']}", headers=st.session_state['headers'])
         if response.json()['status'] == 'completed':
@@ -47,10 +43,6 @@ def save_transcription_to_files(text):
     with open('transcription.txt', 'w') as file:
         file.write(text)
     srt_response = requests.get(f"{st.session_state['endpoint']}/st.session_state['transcript_id']/srt", headers={"authorization": st.secrets['api_key']})
-    ###
-    st.write(st.session_state['endpoint'])
-    st.write(st.session_state['transcript_id'])
-    ###
     with open("transcription.srt", "w") as file:
         file.write(srt_response.text)
     with ZipFile('transcription.zip', 'w') as file:
@@ -82,3 +74,8 @@ if submit_button:
             file_name="transcription.zip",
             mime="application/zip"
         )
+
+###
+st.write(st.session_state['endpoint'])
+st.write(st.session_state['transcript_id'])
+###
