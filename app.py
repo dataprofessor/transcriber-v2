@@ -93,4 +93,4 @@ def get_subtitle_file(transcript_id, api_token, file_format):
     else:
         raise RuntimeError(f"Failed to retrieve {file_format.upper()} file: {response.status_code} {response.reason}")
         
- get_subtitle_file(st.session_state['transcript_id'], st.secrets['api_key'], 'srt')
+get_subtitle_file(st.session_state['transcript_id'], st.secrets['api_key'], 'srt')
