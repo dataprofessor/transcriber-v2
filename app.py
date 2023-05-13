@@ -36,6 +36,7 @@ def transcribe_audio(api_key, audio_url):
 # Function to save transcription to files
 def save_transcription_to_files(text):
     endpoint = "https://api.assemblyai.com/v2/transcript"
+    headers = {"authorization": api_key, "content-type": "application/json"}
     with open('transcription.txt', 'w') as file:
         file.write(text)
     srt_response = requests.get(f"{endpoint}/srt", headers=headers)
