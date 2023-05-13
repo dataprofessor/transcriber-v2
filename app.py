@@ -74,11 +74,13 @@ if submit_button:
         
         col1, col2 = st.columns(2)
         with col1:
+            st.subheader('Transcription text')
             with open('transcription.txt', 'r') as f:
-                st.write(f.readlines())
+                [st.write(line) for line in f.readlines()]
         with col2:
+            st.subheader('Subtitle')
             with open('transcription.srt', 'r') as f:
-                st.write(f.readlines())
+                [st.write(line) for line in f.readlines()]
         
         with open("transcription.zip", "rb") as zip_download:
             st.download_button(
