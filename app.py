@@ -12,7 +12,7 @@ if 'endpoint' not in st.session_state:
 if 'transcript_id' not in st.session_state:
     st.session_state['transcript_id'] = ''
 if 'headers' not in st.session_state:
-    st.session_state['headers'] = {"authorization": st.session_state['api_key'], "content-type": "application/json"}
+    st.session_state['headers'] = {"authorization": st.secrets['api_key'], "content-type": "application/json"}
                                                                      
 # Function to download audio from a YouTube video
 def get_youtube_audio(url):
@@ -22,7 +22,7 @@ def get_youtube_audio(url):
 
 # Function to upload audio file to AssemblyAI
 def upload_audio_to_assemblyai(filename):
-    headers = {'authorization': st.session_state['api_key']}
+    headers = {'authorization': st.secrets['api_key']}
     with open(filename, 'rb') as file:
         response = requests.post('https://api.assemblyai.com/v2/upload', headers=headers, data=file)
     return response.json()['upload_url']
