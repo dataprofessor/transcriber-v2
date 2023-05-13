@@ -42,7 +42,7 @@ def transcribe_audio(audio_url):
 def save_transcription_to_files(text):
     with open('transcription.txt', 'w') as file:
         file.write(text)
-    srt_response = requests.get(f"{st.session_state['endpoint']}/srt", headers=st.session_state['headers'])
+    srt_response = requests.get(f"{st.session_state['endpoint']}/st.session_state['transcript_id']/srt", headers={"authorization": st.secrets['api_key']})
     with open("transcription.srt", "w") as file:
         file.write(srt_response.text)
     with ZipFile('transcription.zip', 'w') as file:
