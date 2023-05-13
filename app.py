@@ -72,17 +72,15 @@ if submit_button:
         save_transcription_to_files(text)
         placeholder.info('Calculation complete!', icon='ℹ️')
         
-        col1, col2 = st.columns(2)
-        with col1:
-            with st.expander('See Transcription text'):
-                st.subheader('Transcription text')
-                with open('transcription.txt', 'r') as f:
-                    [st.write(line) for line in f.readlines()]
-        with col2:
-            with st.expander('See Subtitle'):
-                st.subheader('Subtitle')
-                with open('transcription.srt', 'r') as f:
-                    [st.write(line) for line in f.readlines()]
+        tab1, tab2 = st.tabs(['Text', 'Subtitle'])
+        with tab1:
+            st.subheader('Transcription text')
+            with open('transcription.txt', 'r') as f:
+                [st.write(line) for line in f.readlines()]
+        with tab2:
+            st.subheader('Subtitle')
+            with open('transcription.srt', 'r') as f:
+                [st.write(line) for line in f.readlines()]
         
         with open("transcription.zip", "rb") as zip_download:
             st.download_button(
