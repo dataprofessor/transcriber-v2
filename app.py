@@ -48,8 +48,8 @@ def save_transcription_to_files(text):
 st.markdown('# 📝 **Transcriber App**')
 st.warning('Awaiting URL input in the sidebar.')
 
-# Sidebar input form
-with st.sidebar.form(key='my_form'):
+# Input form
+with st.form(key='my_form'):
     url = st.text_input('Enter URL of YouTube video:')
     submit_button = st.form_submit_button(label='Go')
 
