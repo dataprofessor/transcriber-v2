@@ -51,7 +51,6 @@ def save_transcription_to_files(text):
 
 # Streamlit app
 st.markdown('# 📝 **Transcriber App**')
-st.warning('Awaiting URL input in the sidebar.')
 
 # Input form
 with st.form(key='my_form'):
