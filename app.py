@@ -1,140 +1,71 @@
+# Importing necessary libraries
 import streamlit as st
 from pytube import YouTube
 import os
-import sys
-import time
 import requests
 from zipfile import ZipFile
+from time import sleep
 
-st.markdown('# 📝 **Transcriber App**')
-bar = st.progress(0)
+# Function to download audio from a YouTube video
+def get_youtube_audio(url):
+    video = YouTube(url)
+    audio = video.streams.get_audio_only()
+    audio.download()
+    return os.path.join(os.getcwd(), f"{video.title}.mp4")
 
-# Custom functions 
-
-# 2. Retrieving audio file from YouTube video
-def get_yt(URL):
-    video = YouTube(URL)
-    yt = video.streams.get_audio_only()
-    yt.download()
-
-    #st.info('2. Audio file has been retrieved from YouTube video')
-    bar.progress(10)
-
-# 3. Upload YouTube audio file to AssemblyAI
-def transcribe_yt():
-
-    current_dir = os.getcwd()
-
-    for file in os.listdir(current_dir):
-        if file.endswith(".mp4"):
-            mp4_file = os.path.join(current_dir, file)
-            #print(mp4_file)
-    filename = mp4_file
-    bar.progress(20)
-
-    def read_file(filename, chunk_size=5242880):
-        with open(filename, 'rb') as _file:
-            while True:
-                data = _file.read(chunk_size)
-                if not data:
-                    break
-                yield data
+# Function to upload audio file to AssemblyAI
+def upload_audio_to_assemblyai(api_key, filename):
     headers = {'authorization': api_key}
-    response = requests.post('https://api.assemblyai.com/v2/upload',
-                            headers=headers,
-                            data=read_file(filename))
-    audio_url = response.json()['upload_url']
-    #st.info('3. YouTube audio file has been uploaded to AssemblyAI')
-    bar.progress(30)
+    with open(filename, 'rb') as file:
+        response = requests.post('https://api.assemblyai.com/v2/upload', headers=headers, data=file)
+    return response.json()['upload_url']
 
-    # 4. Transcribe uploaded audio file
+# Function to transcribe audio using AssemblyAI API
+def transcribe_audio(api_key, audio_url):
     endpoint = "https://api.assemblyai.com/v2/transcript"
-
-    json = {
-    "audio_url": audio_url
-    }
-
-    headers = {
-        "authorization": api_key,
-        "content-type": "application/json"
-    }
-
-    transcript_input_response = requests.post(endpoint, json=json, headers=headers)
-
-    #st.info('4. Transcribing uploaded file')
-    bar.progress(40)
-
-    # 5. Extract transcript ID
-    transcript_id = transcript_input_response.json()["id"]
-    #st.info('5. Extract transcript ID')
-    bar.progress(50)
-
-    # 6. Retrieve transcription results
-    endpoint = f"https://api.assemblyai.com/v2/transcript/{transcript_id}"
-    headers = {
-        "authorization": api_key,
-    }
-    transcript_output_response = requests.get(endpoint, headers=headers)
-    #st.info('6. Retrieve transcription results')
-    bar.progress(60)
-
-    # Check if transcription is complete
-    from time import sleep
-
-    while transcript_output_response.json()['status'] != 'completed':
+    headers = {"authorization": api_key, "content-type": "application/json"}
+    data = {"audio_url": audio_url}
+    response = requests.post(endpoint, json=data, headers=headers)
+    transcript_id = response.json()["id"]
+    while True:
+        response = requests.get(f"{endpoint}/{transcript_id}", headers=headers)
+        if response.json()['status'] == 'completed':
+            return response.json()["text"]
         sleep(5)
-        st.warning('Transcription is processing ...')
-        transcript_output_response = requests.get(endpoint, headers=headers)
-    
-    bar.progress(100)
 
-    # 7. Print transcribed text
-    st.header('Output')
-    st.success(transcript_output_response.json()["text"])
+# Function to save transcription to files
+def save_transcription_to_files(text):
+    with open('transcription.txt', 'w') as file:
+        file.write(text)
+    srt_response = requests.get(f"{endpoint}/srt", headers=headers)
+    with open("transcription.srt", "w") as file:
+        file.write(srt_response.text)
+    with ZipFile('transcription.zip', 'w') as file:
+        file.write('transcription.txt')
+        file.write('transcription.srt')
 
-    # 8. Save transcribed text to file
-
-    # Save as TXT file
-    yt_txt = open('yt.txt', 'w')
-    yt_txt.write(transcript_output_response.json()["text"])
-    yt_txt.close()
-
-    # Save as SRT file
-    srt_endpoint = endpoint + "/srt"
-    srt_response = requests.get(srt_endpoint, headers=headers)
-    with open("yt.srt", "w") as _file:
-        _file.write(srt_response.text)
-    
-    zip_file = ZipFile('transcription.zip', 'w')
-    zip_file.write('yt.txt')
-    zip_file.write('yt.srt')
-    zip_file.close()
-#####
-
-# The App
-
-# 1. Read API from text file
-api_key = st.secrets['api_key']
-
-#st.info('1. API is read ...')
+# Streamlit app
+st.markdown('# 📝 **Transcriber App**')
 st.warning('Awaiting URL input in the sidebar.')
 
-
-# Sidebar
-st.sidebar.header('Input parameter')
-
-
+# Sidebar input form
 with st.sidebar.form(key='my_form'):
-	URL = st.text_input('Enter URL of YouTube video:')
-	submit_button = st.form_submit_button(label='Go')
+    url = st.text_input('Enter URL of YouTube video:')
+    submit_button = st.form_submit_button(label='Go')
 
-# Run custom functions if URL is entered 
+# If form is submitted, execute the app
 if submit_button:
-    get_yt(URL)
-    transcribe_yt()
-
+    api_key = st.secrets['api_key']
+    st.info('Retrieving audio file from YouTube video...')
+    audio_file = get_youtube_audio(url)
+    st.info('Uploading audio file to AssemblyAI...')
+    audio_url = upload_audio_to_assemblyai(api_key, audio_file)
+    st.info('Transcribing audio file...')
+    text = transcribe_audio(api_key, audio_url)
+    st.info('Saving transcription to files...')
+    save_transcription_to_files(text)
     with open("transcription.zip", "rb") as zip_download:
-        btn = st.download_button(
+        st.download_button(
             label="Download ZIP",
             data=zip_download,
             file_name="transcription.zip",
