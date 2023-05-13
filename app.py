@@ -36,7 +36,7 @@ def transcribe_audio(audio_url):
         response = requests.get(f"{st.session_state['endpoint']}/{st.session_state['transcript_id']}", headers=st.session_state['headers'])
         if response.json()['status'] == 'completed':
             return response.json()["text"]
-        sleep(5)
+        sleep(3)
 
 # Function to save transcription to files
 def save_transcription_to_files(text):
@@ -59,18 +59,19 @@ with st.form(key='my_form'):
 
 # If form is submitted, execute the app
 if submit_button:
-    st.info('Retrieving audio file from YouTube video...')
-    audio_file = get_youtube_audio(url)
-    st.info('Uploading audio file to AssemblyAI...')
-    audio_url = upload_audio_to_assemblyai(audio_file)
-    st.info('Transcribing audio file...')
-    text = transcribe_audio(audio_url)
-    st.info('Saving transcription to files...')
-    save_transcription_to_files(text)
-    with open("transcription.zip", "rb") as zip_download:
-        st.download_button(
-            label="Download ZIP",
-            data=zip_download,
-            file_name="transcription.zip",
-            mime="application/zip"
-        )
+    with st.spinner('Calculating ...'):
+        st.info('Retrieving audio file from YouTube video...')
+        audio_file = get_youtube_audio(url)
+        st.info('Uploading audio file to AssemblyAI...')
+        audio_url = upload_audio_to_assemblyai(audio_file)
+        st.info('Transcribing audio file...')
+        text = transcribe_audio(audio_url)
+        st.info('Saving transcription to files...')
+        save_transcription_to_files(text)
+        with open("transcription.zip", "rb") as zip_download:
+            st.download_button(
+                label="Download ZIP",
+                data=zip_download,
+                file_name="transcription.zip",
+                mime="application/zip"
+            )
