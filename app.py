@@ -30,10 +30,10 @@ def upload_audio_to_assemblyai(filename):
 # Function to transcribe audio using AssemblyAI API
 def transcribe_audio(audio_url):
     data = {"audio_url": audio_url}
-    response = requests.post(st.session_state['endpoint], json=data, headers=st.session_state['headers])
+    response = requests.post(st.session_state['endpoint], json=data, headers=st.session_state['headers'])
     st.session_state['transcript_id'] = response.json()["id"]
     while True:
-        response = requests.get(f"{st.session_state['endpoint]}/{st.session_state['transcript_id']}", headers=st.session_state['headers])
+        response = requests.get(f"{st.session_state['endpoint]}/{st.session_state['transcript_id']}", headers=st.session_state['headers'])
         if response.json()['status'] == 'completed':
             return response.json()["text"]
         sleep(5)
@@ -42,7 +42,7 @@ def transcribe_audio(audio_url):
 def save_transcription_to_files(text):
     with open('transcription.txt', 'w') as file:
         file.write(text)
-    srt_response = requests.get(f"{st.session_state['endpoint]}/srt", headers=st.session_state['headers])
+    srt_response = requests.get(f"{st.session_state['endpoint]}/srt", headers=st.session_state['headers'])
     with open("transcription.srt", "w") as file:
         file.write(srt_response.text)
     with ZipFile('transcription.zip', 'w') as file:
