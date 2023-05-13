@@ -71,6 +71,15 @@ if submit_button:
         placeholder.info('Saving transcription to files...')
         save_transcription_to_files(text)
         placeholder.info('Calculation complete!', icon='ℹ️')
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            with open('transcription.txt', 'r') as f:
+                st.write(f)
+        with col2:
+            with open('transcription.srt', 'r') as f:
+                st.write(f)
+        
         with open("transcription.zip", "rb") as zip_download:
             st.download_button(
                 label="Download ZIP",
@@ -78,9 +87,3 @@ if submit_button:
                 file_name="transcription.zip",
                 mime="application/zip"
             )
-
-if 'submitted' in st.session_state:
-    st.write(srt_response.text)
-    st.write(zip_download)
-    st.write('-----')
-    st.write(text)
