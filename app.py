@@ -75,10 +75,10 @@ if submit_button:
         col1, col2 = st.columns(2)
         with col1:
             with open('transcription.txt', 'r') as f:
-                st.write(f)
+                st.write(f.readlines())
         with col2:
             with open('transcription.srt', 'r') as f:
-                st.write(f)
+                st.write(f.readlines())
         
         with open("transcription.zip", "rb") as zip_download:
             st.download_button(
