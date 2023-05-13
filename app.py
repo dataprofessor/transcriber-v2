@@ -74,23 +74,3 @@ if submit_button:
             file_name="transcription.zip",
             mime="application/zip"
         )
-
-###
-st.write(st.session_state['endpoint'])
-st.write(st.session_state['transcript_id'])
-###
-def get_subtitle_file(transcript_id, api_token, file_format):
-    if file_format not in ["srt", "vtt"]:
-        raise ValueError("Invalid file format. Valid formats are 'srt' and 'vtt'.")
-
-    url = f"https://api.assemblyai.com/v2/transcript/{transcript_id}/{file_format}"
-    headers = {"authorization": api_token}
-
-    response = requests.get(url, headers=headers)
-
-    if response.status_code == 200:
-        return st.write(response.text)
-    else:
-        raise RuntimeError(f"Failed to retrieve {file_format.upper()} file: {response.status_code} {response.reason}")
-        
-#get_subtitle_file(st.session_state['transcript_id'], st.secrets['api_key'], 'srt')
