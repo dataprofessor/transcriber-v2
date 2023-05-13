@@ -6,40 +6,43 @@ import requests
 from zipfile import ZipFile
 from time import sleep
 
+# Initialize session state
+if 'endpoint' not in st.session_state:
+    st.session_state['endpoint'] = 'https://api.assemblyai.com/v2/transcript'
+if 'transcript_id' not in st.session_state:
+    st.session_state['transcript_id'] = ''
+if 'headers' not in st.session_state:
+    st.session_state['headers'] = {"authorization": st.session_state['api_key], "content-type": "application/json"}
+                                                                     
 # Function to download audio from a YouTube video
 def get_youtube_audio(url):
     video = YouTube(url)
     audio = video.streams.get_audio_only()
-    audio.download()
-    return os.path.join(os.getcwd(), f"{video.title}.mp4")
+    return audio.download()
 
 # Function to upload audio file to AssemblyAI
-def upload_audio_to_assemblyai(api_key, filename):
-    headers = {'authorization': api_key}
+def upload_audio_to_assemblyai(filename):
+    headers = {'authorization': st.session_state['api_key]}
     with open(filename, 'rb') as file:
         response = requests.post('https://api.assemblyai.com/v2/upload', headers=headers, data=file)
     return response.json()['upload_url']
 
 # Function to transcribe audio using AssemblyAI API
-def transcribe_audio(api_key, audio_url):
-    endpoint = "https://api.assemblyai.com/v2/transcript"
-    headers = {"authorization": api_key, "content-type": "application/json"}
+def transcribe_audio(audio_url):
     data = {"audio_url": audio_url}
-    response = requests.post(endpoint, json=data, headers=headers)
-    transcript_id = response.json()["id"]
+    response = requests.post(st.session_state['endpoint], json=data, headers=st.session_state['headers])
+    st.session_state['transcript_id'] = response.json()["id"]
     while True:
-        response = requests.get(f"{endpoint}/{transcript_id}", headers=headers)
+        response = requests.get(f"{st.session_state['endpoint]}/{st.session_state['transcript_id']}", headers=st.session_state['headers])
         if response.json()['status'] == 'completed':
             return response.json()["text"]
         sleep(5)
 
 # Function to save transcription to files
 def save_transcription_to_files(text):
-    endpoint = "https://api.assemblyai.com/v2/transcript"
-    headers = {"authorization": api_key, "content-type": "application/json"}
     with open('transcription.txt', 'w') as file:
         file.write(text)
-    srt_response = requests.get(f"{endpoint}/srt", headers=headers)
+    srt_response = requests.get(f"{st.session_state['endpoint]}/srt", headers=st.session_state['headers])
     with open("transcription.srt", "w") as file:
         file.write(srt_response.text)
     with ZipFile('transcription.zip', 'w') as file:
@@ -57,13 +60,12 @@ with st.form(key='my_form'):
 
 # If form is submitted, execute the app
 if submit_button:
-    api_key = st.secrets['api_key']
     st.info('Retrieving audio file from YouTube video...')
     audio_file = get_youtube_audio(url)
     st.info('Uploading audio file to AssemblyAI...')
-    audio_url = upload_audio_to_assemblyai(api_key, audio_file)
+    audio_url = upload_audio_to_assemblyai(audio_file)
     st.info('Transcribing audio file...')
-    text = transcribe_audio(api_key, audio_url)
+    text = transcribe_audio(audio_url)
     st.info('Saving transcription to files...')
     save_transcription_to_files(text)
     with open("transcription.zip", "rb") as zip_download:
