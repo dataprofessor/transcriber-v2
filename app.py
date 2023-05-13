@@ -49,8 +49,8 @@ def save_transcription_to_files(text):
         file.write('transcription.txt')
         file.write('transcription.srt')
 
-# Streamlit app
-st.markdown('# 📝 **Transcriber App**')
+        
+st.title('Transcriber App')
 
 # Input form
 with st.form(key='my_form'):
