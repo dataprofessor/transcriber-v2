@@ -69,7 +69,7 @@ if submit_button:
         text = transcribe_audio(audio_url)
         placeholder.info('Saving transcription to files...')
         save_transcription_to_files(text)
-        placeholder.info('Calculation complete! Download the ZIP file! 👇')
+        placeholder.info('Calculation complete!, icon='ℹ️')
         with open("transcription.zip", "rb") as zip_download:
             st.download_button(
                 label="Download ZIP",
