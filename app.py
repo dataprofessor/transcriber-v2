@@ -50,7 +50,7 @@ def save_transcription_to_files(text):
         file.write('transcription.srt')
 
         
-st.title('Transcriber App')
+st.title('🔊 Transcriber App v2')
 
 # Input form
 with st.form(key='my_form'):
