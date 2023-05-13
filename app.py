@@ -60,14 +60,16 @@ with st.form(key='my_form'):
 # If form is submitted, execute the app
 if submit_button:
     with st.spinner('Calculating ...'):
-        st.info('Retrieving audio file from YouTube video...')
+        placeholder = st.empty()
+        placeholder.info('Retrieving audio file from YouTube video...')
         audio_file = get_youtube_audio(url)
-        st.info('Uploading audio file to AssemblyAI...')
+        placeholder.info('Uploading audio file to AssemblyAI...')
         audio_url = upload_audio_to_assemblyai(audio_file)
-        st.info('Transcribing audio file...')
+        placeholder.info('Transcribing audio file...')
         text = transcribe_audio(audio_url)
-        st.info('Saving transcription to files...')
+        placeholder.info('Saving transcription to files...')
         save_transcription_to_files(text)
+        placeholder.info('Calculation complete! Download the ZIP file! 👇')
         with open("transcription.zip", "rb") as zip_download:
             st.download_button(
                 label="Download ZIP",
