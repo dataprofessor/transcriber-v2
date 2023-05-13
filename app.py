@@ -72,7 +72,7 @@ if submit_button:
         save_transcription_to_files(text)
         placeholder.info('Calculation complete!', icon='ℹ️')
         
-        tab1, tab2 = st.tabs(['Text', 'Subtitle'])
+        tab1, tab2 = st.tabs(['🔤 Text', '📺 Subtitle'])
         with tab1:
             st.subheader('Transcription text')
             with open('transcription.txt', 'r') as f:
@@ -84,7 +84,7 @@ if submit_button:
         
         with open("transcription.zip", "rb") as zip_download:
             st.download_button(
-                label="Download ZIP",
+                label=" Download ZIP",
                 data=zip_download,
                 file_name="transcription.zip",
                 mime="application/zip"
