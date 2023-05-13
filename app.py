@@ -59,6 +59,7 @@ with st.form(key='my_form'):
 
 # If form is submitted, execute the app
 if submit_button:
+    st.session_state.submitted = True
     with st.spinner('Calculating ...'):
         placeholder = st.empty()
         placeholder.info('Retrieving audio file from YouTube video...')
@@ -77,3 +78,8 @@ if submit_button:
                 file_name="transcription.zip",
                 mime="application/zip"
             )
+
+if 'submitted' in st.session_state:
+    st.write(srt_response.text)
+    st.write(zip_download)
+    st.write(text)
