@@ -82,4 +82,5 @@ if submit_button:
 if 'submitted' in st.session_state:
     st.write(srt_response.text)
     st.write(zip_download)
+    st.write('-----')
     st.write(text)
